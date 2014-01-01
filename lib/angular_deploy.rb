@@ -12,7 +12,7 @@ module AngularDeploy
     def initialize(&block)
       @settings = Config.new
       @settings.instance_eval(&block) if block_given?
-      @deploy_dir = './.ng-deploy'
+      @deploy_dir = './tmp/angular_deploy'
     end
 
     def package(config_name, &block)
