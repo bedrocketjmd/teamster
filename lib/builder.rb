@@ -62,8 +62,7 @@ module Deploy
       if settings.concatenate
         ['application.js'].each do |file|
           asset = sprockets[file]
-          path = (settings.logical_path == true) ? asset.logical_path : asset.digest_path
-          outfile = Pathname.new("#{@deploy_dir}/assets").join(path)
+          outfile = Pathname.new("#{@deploy_dir}/assets").join(asset.digest_path)
           asset.write_to(outfile)
           asset.write_to("#{outfile}.gz")
         end

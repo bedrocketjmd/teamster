@@ -3,6 +3,7 @@ require 'uglifier'
 require 'pry'
 
 require_relative 'builder'
+require_relative 'sprockets'
 
 module Deploy
 
@@ -42,6 +43,7 @@ module Deploy
     end
 
     private
+
     def define_accessor(name, &block)
       Deploy::Config.class_eval { define_method(name, &block) }
     end
