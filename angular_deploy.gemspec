@@ -1,12 +1,12 @@
 Gem::Specification.new do |s|
-  s.name        = 'ng_deploy'
-  s.version     = '0.0.0'
+  s.name        = 'angular_deploy'
+  s.version     = '0.0.1'
   s.date        = '2013-12-25'
-  s.description = "Gem to build and deploy spa application"
+  s.description = "Gem to build and deploy angular spa application"
   s.summary     = "Builds and deploys necessary html and js/css files based on sprockets configuration."
   s.authors     = ["Shovan Joshi"]
   s.email       = 'shovanj@gmail.com'
-  s.files       = ["lib/ng_deploy.rb"]
+  s.files       = ["lib/angular_deploy.rb"]
   s.homepage    = ""
   s.license       = 'MIT'
 

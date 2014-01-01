@@ -5,7 +5,7 @@ require 'pry'
 require_relative 'builder'
 require_relative 'sprockets'
 
-module Deploy
+module AngularDeploy
 
   class Configs
 
@@ -45,7 +45,7 @@ module Deploy
     private
 
     def define_accessor(name, &block)
-      Deploy::Config.class_eval { define_method(name, &block) }
+      AngularDeploy::Config.class_eval { define_method(name, &block) }
     end
   end
 

@@ -1,4 +1,4 @@
-module Deploy
+module AngularDeploy
   class Builder
 
     attr_reader :settings, :sprockets
