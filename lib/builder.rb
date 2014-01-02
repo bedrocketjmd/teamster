@@ -95,6 +95,22 @@ module AngularDeploy
       puts " Done "
     end
 
+    def upload_to_s3
+      s3 = AWS::S3.new( access_key_id: @settings.s3_access_key_id,
+                        secret_access_key: @settings.s3_secret_access_key)
+      bucket = s3.buckets[@settings.bucket]
+      print "Uploading site "
+
+      Dir.glob("#{@deploy_dir}/**/*").each do |file|
+        if File.file?(file)
+          remote_file = file.gsub( @deploy_dir, "" )
+          print '.'
+          s3_object = bucket.objects[remote_file]
+          s3_object.write(file: file, content_type: MIME::Types.type_for(file).first)
+        end
+      end
+      print "Done"
+    end
   end
 
 end

@@ -13,6 +13,7 @@ module AngularDeploy
       @settings = Config.new
       @settings.instance_eval(&block) if block_given?
       @deploy_dir = './tmp/angular_deploy'
+      @builder = Builder.new(@settings, @sprockets, @deploy_dir)
     end
 
     def package(config_name, &block)
@@ -21,7 +22,11 @@ module AngularDeploy
     end
 
     def build_files
-      Builder.new(@settings, @sprockets, @deploy_dir).build_files
+      @builder.build_files
+    end
+
+    def upload_to_s3
+      @builder.upload_to_s3
     end
   end
 
