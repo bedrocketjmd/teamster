@@ -1,6 +1,7 @@
 require 'sprockets'
 require 'uglifier'
 require 'pry'
+require 'aws-sdk'
 
 require_relative 'builder'
 

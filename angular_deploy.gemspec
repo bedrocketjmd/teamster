@@ -13,5 +13,6 @@ Gem::Specification.new do |s|
   s.add_dependency "sprockets", "~> 2.10.1"
 
   s.add_development_dependency "bundler", "~> 1.3"
+  s.add_development_dependency "aws-sdk", "1.30.0"
   s.add_development_dependency "pry"
 end
