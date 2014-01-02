@@ -103,7 +103,7 @@ module AngularDeploy
 
       Dir.glob("#{@deploy_dir}/**/*").each do |file|
         if File.file?(file)
-          remote_file = file.gsub( @deploy_dir, "" )
+          remote_file = file.gsub( "#{@deploy_dir}/", "" )
           print '.'
           s3_object = bucket.objects[remote_file]
           s3_object.write(file: file, content_type: MIME::Types.type_for(file).first)
