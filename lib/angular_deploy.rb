@@ -2,6 +2,7 @@ require 'sprockets'
 require 'uglifier'
 require 'pry'
 require 'aws-sdk'
+require "yui/compressor"
 
 require_relative 'builder'
 

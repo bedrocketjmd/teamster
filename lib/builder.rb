@@ -7,7 +7,11 @@ module AngularDeploy
       @settings, @sprockets, @deploy_dir = settings, sprockets, deploy_dir
       @sprockets = Sprockets::Environment.new('./') { |env| }
       @settings.sprockets_path.each { |path| @sprockets.append_path( File.join( path ) ) }
-      @sprockets.js_compressor = Uglifier.new(:mangle => false) if @settings.compress
+
+      if @settings.compress
+        @sprockets.js_compressor = Uglifier.new(:mangle => false)
+        @sprockets.css_compressor = YUI::CssCompressor.new
+      end
 
       FileUtils.remove_dir(@deploy_dir, force: true)
       FileUtils.mkdir_p(@deploy_dir + '/assets')
