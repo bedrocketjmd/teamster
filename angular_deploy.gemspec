@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'angular_deploy'
+  s.name        = 'angular-deploy'
   s.version     = '0.0.1'
   s.date        = '2013-12-25'
   s.description = "Gem to build and deploy angular spa application"
@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.homepage    = ""
   s.license       = 'MIT'
 
-  s.add_dependency "sprockets", "~> 2.10.1"
+  s.add_dependency "sprockets", "~> 2.2.2"
 
   s.add_development_dependency "bundler", "~> 1.3"
   s.add_development_dependency "pry"
