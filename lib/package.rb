@@ -51,7 +51,7 @@ class Package
         sprocket = sprockets['application.js']
         digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
         data += digest_paths.
-          collect { |js_file| "<script src=\"//#{package_config.host}/assets/#{js_file}\"></script>" }.
+          collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
       else
         data += line
