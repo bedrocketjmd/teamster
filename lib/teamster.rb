@@ -45,7 +45,11 @@ module Teamster
         self.instance_eval( &block ) if block_given?
       end
 
-      def assets( &block )
+      def javascripts( &block )
+        self.instance_eval( &block ) if block_given?
+      end
+
+      def stylesheets( &block )
         self.instance_eval( &block ) if block_given?
       end
 
