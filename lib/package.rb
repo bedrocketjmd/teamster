@@ -8,7 +8,7 @@ class Package
 
     if @package_config.compress
       @sprockets.js_compressor = Uglifier.new(:mangle => false)
-      @sprockets.css_compressor = YUI::CssCompressor.new
+      @sprockets.css_compressor = CSSminify.new
     end
 
     FileUtils.remove_dir(package_config.location, force: true)

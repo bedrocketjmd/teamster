@@ -3,7 +3,7 @@ require 'sprockets'
 require 'uglifier'
 require 'pry'
 require 'aws-sdk'
-require 'yui/compressor'
+require 'cssminify'
 require 'mime/types'
 
 require_relative 'package'
