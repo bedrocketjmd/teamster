@@ -11,11 +11,14 @@ namespace :deploy do
       # package_dir                 "tmp/teamster"
 
 	  # directories sprockets will look into
-      assets do
+      javascripts do
         directory                 'vendor'
-        directory                 'assets/stylesheets'
         directory                 'app'
         directory                 'config'
+      end
+
+      stylesheets do
+        directory                 'assets/stylesheets'
       end
 
 	  # files from the project that need to be copied over
@@ -23,7 +26,7 @@ namespace :deploy do
 
 	  # combine css/js files into one
       concatenate                 true
-	  
+
 	  # compress css/js files
       compress                    true
 
