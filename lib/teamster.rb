@@ -1,7 +1,6 @@
 require 'jbuilder'
 require 'sprockets'
 require 'uglifier'
-require 'pry'
 require 'aws-sdk'
 require 'cssminify'
 require 'mime/types'
