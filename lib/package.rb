@@ -105,7 +105,7 @@ class Package
                                               secret_access_key: s3_config.secret_access_key)
     bucket = s3.buckets[package_config.target_service_uri]
 
-    print "Uploading site "
+    print "    => Uploading site "
 
     Dir.glob("#{package_config.location}/**/*").each do |file|
       if File.file?(file)
