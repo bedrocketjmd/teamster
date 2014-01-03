@@ -29,7 +29,7 @@ class Package
       if f.is_a? Hash
         src = f[:src]
         dest = dest + '/' + f[:dest]
-        FileUtils.mkdir_p(File.dirname(dest))
+        FileUtils.mkdir_p(dest)
       else
         src = f
       end
