@@ -47,7 +47,7 @@ class Package
     data = ""
     f = File.open("#{package_config.location}/index.html", "r")
     f.each_line do |line|
-      if line =~ /src=\"assets\/application.js/
+      if line =~ /src=\"\/assets\/application.js/
         sprocket = sprockets['application.js']
         digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
         data += digest_paths.
