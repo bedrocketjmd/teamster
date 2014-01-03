@@ -12,17 +12,29 @@ class Package
     end
 
     FileUtils.remove_dir(package_config.location, force: true)
-    FileUtils.mkdir_p(package_config.location + '/assets')
-    FileUtils.cp_r( Dir.glob('./public/*'), package_config.location )
-    FileUtils.cp_r( './app', package_config.location )
-    FileUtils.cp_r( Dir.glob('./assets/images/*'), "#{package_config.location}/assets" )
+    FileUtils.mkdir_p(package_config.location)
   end
 
   def pack
+    copy_files
     compile_css
     compile_js
     build_dynamic_files
     build_index_html
+  end
+
+  def copy_files
+    @package_config.copy_files.each do |f|
+      dest = package_config.location
+      if f.is_a? Hash
+        src = f[:src]
+        dest = dest + '/' + f[:dest]
+        FileUtils.mkdir_p(File.dirname(dest))
+      else
+        src = f
+      end
+      FileUtils.cp_r( Dir.glob(src), dest )
+    end
   end
 
   def build_dynamic_files

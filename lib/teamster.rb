@@ -61,6 +61,7 @@ module Teamster
       end
 
       define_attribute :host
+      define_attribute :copy_files
 
       def directory( dir )
         @asset_paths << dir unless @asset_paths.include?( dir )
