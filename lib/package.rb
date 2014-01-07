@@ -70,14 +70,8 @@ class Package
       compile_asset(sprockets['application.js'])
     else
       sprockets["application.js"].dependencies.each do |processed_asset|
-        if package_config.compress
-          print '.'
-          outfile = Pathname.new("#{package_config.location}/assets").join(processed_asset.digest_path)
-          processed_asset.modified_write_to(outfile, Uglifier.compile(processed_asset.source, :mangle => false))
-          processed_asset.modified_write_to("#{outfile}.gz", Uglifier.compile(processed_asset.source, :mangle => false))
-        else
-          compile_asset(processed_asset)
-        end
+        modified = package_config.compress ? true : false
+        compile_asset(processed_asset, modified: modified)
       end
     end
     puts " Done"
@@ -110,10 +104,16 @@ class Package
 
   private
 
-  def compile_asset(asset)
+  def compile_asset(asset, modified: false)
+    print '.'
     outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
-    asset.write_to(outfile)
-    asset.write_to("#{outfile}.gz")
+    if modified
+      asset.modified_write_to(outfile, Uglifier.compile(asset.source, :mangle => false))
+      asset.modified_write_to("#{outfile}.gz", Uglifier.compile(asset.source, :mangle => false))
+    else
+      asset.write_to(outfile)
+      asset.write_to("#{outfile}.gz")
+    end
   end
 
 end
