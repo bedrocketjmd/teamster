@@ -53,6 +53,9 @@ class Package
         data += digest_paths.
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
+      elsif line =~  /href=\"\/assets\/application.css/
+        css_file = sprockets['application.css'].digest_path
+        data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
       else
         data += line
       end
@@ -64,22 +67,16 @@ class Package
     printf "    => Compiling js assets ..."
 
     if package_config.concatenate
-      ['application.js'].each do |file|
-        asset = sprockets[file]
-        outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
-        asset.write_to(outfile)
-        asset.write_to("#{outfile}.gz")
-      end
+      compile_asset(sprockets['application.js'])
     else
       sprockets["application.js"].dependencies.each do |processed_asset|
-        outfile = Pathname.new("#{package_config.location}/assets").join(processed_asset.digest_path)
         if package_config.compress
-          puts "Compressing js asset #{processed_asset.digest_path}."
+          print '.'
+          outfile = Pathname.new("#{package_config.location}/assets").join(processed_asset.digest_path)
           processed_asset.modified_write_to(outfile, Uglifier.compile(processed_asset.source, :mangle => false))
           processed_asset.modified_write_to("#{outfile}.gz", Uglifier.compile(processed_asset.source, :mangle => false))
         else
-          processed_asset.write_to(outfile)
-          processed_asset.write_to("#{outfile}.gz")
+          compile_asset(processed_asset)
         end
       end
     end
@@ -88,14 +85,7 @@ class Package
 
   def compile_css
     printf "    => Compiling css assets ..."
-
-    ['application'].each do |file|
-      outfile   = Pathname.new("#{package_config.location}/assets").join("#{file}.css")
-      asset     = sprockets["#{file}.scss"]
-      asset.write_to(outfile)
-      asset.write_to("#{outfile}.gz")
-    end
-
+    compile_asset(sprockets['application.css'])
     puts " Done "
   end
 
@@ -116,6 +106,14 @@ class Package
       end
     end
     print "Done"
+  end
+
+  private
+
+  def compile_asset(asset)
+    outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
+    asset.write_to(outfile)
+    asset.write_to("#{outfile}.gz")
   end
 
 end
