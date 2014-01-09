@@ -53,6 +53,7 @@ class Package
         data += digest_paths.
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
+        data += vc_sha
       elsif line =~  /href=\"\/assets\/application.css/
         css_file = sprockets['application.css'].digest_path
         data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
@@ -74,6 +75,7 @@ class Package
         compile_asset(d, modified: package_config.compress)
       end
     end
+
     puts " Done"
   end
 
@@ -116,6 +118,12 @@ class Package
     end
   end
 
+  def vc_sha
+    sha = `git rev-parse HEAD`
+    "\n<!--\nsha: #{sha} -->"
+  rescue
+    ''
+  end
 end
 
 
