@@ -66,12 +66,12 @@ class Package
   def compile_js
     printf "    => Compiling js assets ..."
 
+    asset = sprockets['application.js']
     if package_config.concatenate
-      compile_asset(sprockets['application.js'])
+      compile_asset(asset)
     else
-      sprockets["application.js"].dependencies.each do |processed_asset|
-        modified = package_config.compress ? true : false
-        compile_asset(processed_asset, modified: modified)
+      asset.dependencies.each do |d|
+        compile_asset(d, modified: package_config.compress)
       end
     end
     puts " Done"
