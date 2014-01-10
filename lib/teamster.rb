@@ -42,6 +42,7 @@ module Teamster
       def initialize( &block )
         @asset_paths = []
         @dynamic_files = []
+        @app_paths = []
         self.instance_eval( &block ) if block_given?
       end
 
@@ -65,9 +66,15 @@ module Teamster
 
       define_attribute :host
       define_attribute :copy_files
+      define_attribute :max_age
+      define_attribute :app_paths
 
       def directory( dir )
         @asset_paths << dir unless @asset_paths.include?( dir )
+      end
+
+      def copy_files(*arguments, &block)
+        self.instance_eval( &block ) if block_given?
       end
 
       def file( *arguments, &block )

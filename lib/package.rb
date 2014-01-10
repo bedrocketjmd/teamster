@@ -24,7 +24,7 @@ class Package
   end
 
   def copy_files
-    @package_config.copy_files.each do |f|
+    @package_config.app_paths.each do |f|
       dest = package_config.location
       if f.is_a? Hash
         src = f[:src]
@@ -98,7 +98,7 @@ class Package
         remote_file = file.gsub( "#{package_config.location}/", "" )
         print '.'
         s3_object = bucket.objects[remote_file]
-        s3_object.write(file: file, content_type: MIME::Types.type_for(file).first)
+        s3_object.write(file: file, content_type: MIME::Types.type_for(file).first, cache_control: "max-age=#{package_config.max_age * 1000}")
       end
     end
     print "Done"
