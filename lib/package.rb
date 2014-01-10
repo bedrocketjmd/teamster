@@ -98,7 +98,7 @@ class Package
         remote_file = file.gsub( "#{package_config.location}/", "" )
         print '.'
         s3_object = bucket.objects[remote_file]
-        s3_object.write(file: file, content_type: MIME::Types.type_for(file).first, cache_control: "max-age=#{package_config.max_age * 1000}")
+        s3_object.write(file: file, content_type: MIME::Types.type_for(file).first, cache_control: "max-age=#{package_config.max_age}")
       end
     end
     print "Done"
