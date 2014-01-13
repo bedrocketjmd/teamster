@@ -120,7 +120,14 @@ class Package
 
   def vc_sha
     sha = `git rev-parse HEAD`
-    "\n<!--\nsha: #{sha} -->"
+    <<-DEPLOY_STRING
+
+<!--
+
+DEPLOY_TIME: #{Time.now}
+SHA: #{sha}
+-->
+DEPLOY_STRING
   rescue
     ''
   end
