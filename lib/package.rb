@@ -51,6 +51,7 @@ class Package
     f = File.open("#{package_config.location}/index.html", "r")
     f.each_line do |line|
       js_match = /[A-Za-z\-\_]+\.js/.match(line)
+      css_match = /[A-Za-z\-\_]+\.css/.match(line)
       if line =~ /\/assets/ && js_match
         sprocket = sprockets[js_match[0]]
         digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
@@ -58,8 +59,8 @@ class Package
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
         data += vc_sha
-      elsif line =~  /href=\"\/assets\/application.css/
-        css_file = sprockets['application.css'].digest_path
+      elsif line =~  /href=\"\/assets\// && css_match
+        css_file = sprockets[css_match[0]].digest_path
         data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
       else
         data += line
