@@ -2,6 +2,8 @@ class Package
   attr_reader :package_config, :sprockets
 
   def initialize(package_config)
+    @css_manifest_files = []
+    @js_manifest_files = []
     @package_config = package_config
     @sprockets = Sprockets::Environment.new('./') { |env| }
     @package_config.asset_paths.each { |path| @sprockets.append_path( File.join( path ) ) }
@@ -17,6 +19,7 @@ class Package
 
   def pack
     copy_files
+    set_manifest_files
     compile_css
     compile_js
     build_dynamic_files
@@ -47,8 +50,9 @@ class Package
     data = ""
     f = File.open("#{package_config.location}/index.html", "r")
     f.each_line do |line|
-      if line =~ /src=\"\/assets\/application.js/
-        sprocket = sprockets['application.js']
+      js_match = /[A-Za-z\-\_]+\.js/.match(line)
+      if line =~ /\/assets/ && js_match
+        sprocket = sprockets[js_match[0]]
         digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
         data += digest_paths.
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
@@ -67,12 +71,14 @@ class Package
   def compile_js
     printf "    => Compiling js assets ..."
 
-    asset = sprockets['application.js']
-    if package_config.concatenate
-      compile_asset(asset)
-    else
-      asset.dependencies.each do |d|
-        compile_asset(d, modified: package_config.compress)
+    @js_manifest_files.each do |file|
+      asset = sprockets[file]
+      if package_config.concatenate
+        compile_asset(asset)
+      else
+        asset.dependencies.each do |d|
+          compile_asset(d, modified: package_config.compress)
+        end
       end
     end
 
@@ -81,7 +87,9 @@ class Package
 
   def compile_css
     printf "    => Compiling css assets ..."
-    compile_asset(sprockets['application.css'])
+    @css_manifest_files.each do |file|
+      compile_asset(sprockets[file])
+    end
     puts " Done "
   end
 
@@ -131,6 +139,22 @@ DEPLOY_STRING
   rescue
     ''
   end
+
+  def set_manifest_files
+    f = File.open("#{package_config.location}/index.html", "r")
+    f.each_line do |line|
+      match  = /[A-Za-z\-\_]+\.js|[A-Za-z\-\_]+\.css/.match(line)
+      if line =~ /\/assets/ && match
+        if match[0] =~ /\.css/
+          @css_manifest_files << match[0]
+        else
+          @js_manifest_files << match[0]
+        end
+      end
+    end
+    f.close
+  end
+
 end
 
 
