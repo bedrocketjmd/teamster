@@ -15,6 +15,7 @@ Gem::Specification.new do |s|
   s.add_dependency "uglifier", "2.3.2"
   s.add_dependency "bundler", "~> 1.3"
   s.add_dependency "aws-sdk", "1.30.0"
+  s.add_dependency "mime-types", "1.23"
   s.add_dependency "cssminify", "1.0.2"
   s.add_dependency "jbuilder", "2.0.2"
 
