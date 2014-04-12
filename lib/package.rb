@@ -54,13 +54,21 @@ class Package
       css_match = /[A-Za-z\-\_]+\.css/.match(line)
       if line =~ /\/assets/ && js_match
         sprocket = sprockets[js_match[0]]
-        digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
-        data += digest_paths.
+        if @package_config.digest
+          js_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
+        else
+          js_paths = (package_config.concatenate) ? [sprocket.logical_path] : sprocket.dependencies.map(&:logical_path)
+        end
+        data += js_paths.
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
         data += vc_sha
       elsif line =~  /href=\"\/assets\// && css_match
-        css_file = sprockets[css_match[0]].digest_path
+        if @package_config.digest
+          css_file = sprockets[css_match[0]].digest_path
+        else
+          css_file = sprockets[css_match[0]].logical_path
+        end
         data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
       else
         data += line
@@ -117,7 +125,11 @@ class Package
 
   def compile_asset(asset, modified: false)
     print '.'
-    outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
+    if @package_config.digest
+      outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
+    else
+      outfile = Pathname.new("#{package_config.location}/assets").join(asset.logical_path)
+    end
     if modified
       asset.modified_write_to(outfile, Uglifier.compile(asset.source, :mangle => false))
       asset.modified_write_to("#{outfile}.gz", Uglifier.compile(asset.source, :mangle => false))
