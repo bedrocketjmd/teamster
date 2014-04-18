@@ -2,6 +2,8 @@ class Package
   attr_reader :package_config, :sprockets
 
   def initialize(package_config)
+    @css_manifest_files = []
+    @js_manifest_files = []
     @package_config = package_config
     @sprockets = Sprockets::Environment.new('./') { |env| }
     @package_config.asset_paths.each { |path| @sprockets.append_path( File.join( path ) ) }
@@ -17,6 +19,7 @@ class Package
 
   def pack
     copy_files
+    set_manifest_files
     compile_css
     compile_js
     build_dynamic_files
@@ -47,15 +50,25 @@ class Package
     data = ""
     f = File.open("#{package_config.location}/index.html", "r")
     f.each_line do |line|
-      if line =~ /src=\"\/assets\/application.js/
-        sprocket = sprockets['application.js']
-        digest_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
-        data += digest_paths.
+      js_match = /[A-Za-z\-\_]+\.js/.match(line)
+      css_match = /[A-Za-z\-\_]+\.css/.match(line)
+      if line =~ /\/assets/ && js_match
+        sprocket = sprockets[js_match[0]]
+        if @package_config.digest
+          js_paths = (package_config.concatenate) ? [sprocket.digest_path] : sprocket.dependencies.map(&:digest_path)
+        else
+          js_paths = (package_config.concatenate) ? [sprocket.logical_path] : sprocket.dependencies.map(&:logical_path)
+        end
+        data += js_paths.
           collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
           join("\n")
         data += vc_sha
-      elsif line =~  /href=\"\/assets\/application.css/
-        css_file = sprockets['application.css'].digest_path
+      elsif line =~  /href=\"\/assets\// && css_match
+        if @package_config.digest
+          css_file = sprockets[css_match[0]].digest_path
+        else
+          css_file = sprockets[css_match[0]].logical_path
+        end
         data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
       else
         data += line
@@ -67,12 +80,14 @@ class Package
   def compile_js
     printf "    => Compiling js assets ..."
 
-    asset = sprockets['application.js']
-    if package_config.concatenate
-      compile_asset(asset)
-    else
-      asset.dependencies.each do |d|
-        compile_asset(d, modified: package_config.compress)
+    @js_manifest_files.each do |file|
+      asset = sprockets[file]
+      if package_config.concatenate
+        compile_asset(asset)
+      else
+        asset.dependencies.each do |d|
+          compile_asset(d, modified: package_config.compress)
+        end
       end
     end
 
@@ -81,7 +96,9 @@ class Package
 
   def compile_css
     printf "    => Compiling css assets ..."
-    compile_asset(sprockets['application.css'])
+    @css_manifest_files.each do |file|
+      compile_asset(sprockets[file])
+    end
     puts " Done "
   end
 
@@ -108,7 +125,11 @@ class Package
 
   def compile_asset(asset, modified: false)
     print '.'
-    outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
+    if @package_config.digest
+      outfile = Pathname.new("#{package_config.location}/assets").join(asset.digest_path)
+    else
+      outfile = Pathname.new("#{package_config.location}/assets").join(asset.logical_path)
+    end
     if modified
       asset.modified_write_to(outfile, Uglifier.compile(asset.source, :mangle => false))
       asset.modified_write_to("#{outfile}.gz", Uglifier.compile(asset.source, :mangle => false))
@@ -131,6 +152,22 @@ DEPLOY_STRING
   rescue
     ''
   end
+
+  def set_manifest_files
+    f = File.open("#{package_config.location}/index.html", "r")
+    f.each_line do |line|
+      match  = /[A-Za-z\-\_]+\.js|[A-Za-z\-\_]+\.css/.match(line)
+      if line =~ /\/assets/ && match
+        if match[0] =~ /\.css/
+          @css_manifest_files << match[0]
+        else
+          @js_manifest_files << match[0]
+        end
+      end
+    end
+    f.close
+  end
+
 end
 
 
