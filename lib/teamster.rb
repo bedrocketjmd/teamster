@@ -101,6 +101,10 @@ module Teamster
       def deploy
         @package.deploy
       end
+
+      def invalidate
+        @package.invalidate
+      end
     end
 
     class S3 < Base

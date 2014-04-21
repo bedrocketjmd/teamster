@@ -121,6 +121,38 @@ class Package
     print "Done"
   end
 
+  def invalidate
+    puts "## building invalidation list"
+    s3_config = package_config.target_service_configuration
+    cdn = AWS::CloudFront.new( access_key_id: s3_config.access_key_id,
+                                              secret_access_key: s3_config.secret_access_key)
+    batch = 1
+    time = Time.now.to_i
+
+    FileList["public/**/*"].exclude("**/.", "**/..", "**/.*").sub("#{package_config.location}/", "").each_slice(1000) do |file_list|
+
+      puts "### Creating batch of size #{file_list.length}"
+      response = cdn.client.create_invalidation(:distribution_id => "",
+                                                :invalidation_batch => {
+                                                  :caller_reference => "rake-#{time}-#{batch}",
+                                                  :paths => {
+                                                    :quantity => file_list.length,
+                                                    :items => file_list
+                                                  }
+                                                })
+
+      puts "    Status: #{response[:status]}"
+
+      if response[:error].nil?
+        puts "    Batch Id: #{response[:id]}"
+      else
+        puts "Failed to create batch (#{response[:error]}), sleeping"
+        error = response[:error]
+      end
+      batch += 1
+    end
+  end
+
   private
 
   def compile_asset(asset, modified: false)
