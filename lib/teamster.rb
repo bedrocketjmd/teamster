@@ -17,12 +17,15 @@ module Teamster
         class_eval(
                    "def #{attribute_name}( *arguments ); " +
                    "@#{attribute_name} = arguments.first unless arguments.empty?; " +
-                   "@#{attribute_name} || " +
+                   "if !@#{attribute_name}.nil?;" +
+                     "@#{attribute_name};" +
+                   "else;" +
                    ( ( options[:default].nil?  ) ?
                      "nil" :
                      ( options[ :default ].is_a?( String ) ?
                        "'#{options[ :default ]}'" :
                        "#{options[ :default ]}" ) ) + ";" +
+                   "end;" +
                    "end",
                    __FILE__,
                    __LINE__
@@ -57,6 +60,7 @@ module Teamster
       define_attribute :concatenate,  default: false
       define_attribute :compress,     default: false
       define_attribute :location,     default: 'tmp/teamster'
+      define_attribute :digest,       default: true
 
       def deploy_to( uri, &block )
         @target_service_uri = uri
