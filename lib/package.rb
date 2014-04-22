@@ -47,6 +47,7 @@ class Package
   end
 
   def build_index_html
+    host = package_config.host.present? ? "//#{package_config.host}" : ''
     data = ""
     f = File.open("#{package_config.location}/index.html", "r")
     f.each_line do |line|
@@ -60,7 +61,7 @@ class Package
           js_paths = (package_config.concatenate) ? [sprocket.logical_path] : sprocket.dependencies.map(&:logical_path)
         end
         data += js_paths.
-          collect { |js_file| "<script src=\"#{package_config.host}/assets/#{js_file}\"></script>" }.
+          collect { |js_file| "<script src=\"#{host}/assets/#{js_file}\"></script>" }.
           join("\n")
         data += vc_sha
       elsif line =~  /href=\"\/assets\// && css_match
@@ -69,7 +70,7 @@ class Package
         else
           css_file = sprockets[css_match[0]].logical_path
         end
-        data += "<link rel=\"stylesheet\" href=\"#{package_config.host}/assets/#{css_file}\">\n"
+        data += "<link rel=\"stylesheet\" href=\"#{host}/assets/#{css_file}\">\n"
       else
         data += line
       end
