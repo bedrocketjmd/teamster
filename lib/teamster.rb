@@ -61,6 +61,8 @@ module Teamster
       define_attribute :compress,     default: false
       define_attribute :location,     default: 'tmp/teamster'
       define_attribute :digest,       default: true
+      define_attribute :cdn_uri
+      define_attribute :api_uri
 
       def deploy_to( uri, &block )
         @target_service_uri = uri

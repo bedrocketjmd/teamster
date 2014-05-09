@@ -71,6 +71,12 @@ class Package
           css_file = sprockets[css_match[0]].logical_path
         end
         data += "<link rel=\"stylesheet\" href=\"#{host}/assets/#{css_file}\">\n"
+      elsif line =~ /<\/head>/
+        if package_config.api_uri && package_config.cdn_uri
+          data += "<meta name='com.bedrocket.boxspring.api.uri' content='#{package_config.api_uri}>\n"
+          data += "<meta name='com.bedrocket.boxspring.cdn.uri' content='#{package_config.cdn_uri}'>\n"
+        end
+        data += line
       else
         data += line
       end
