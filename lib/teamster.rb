@@ -41,11 +41,13 @@ module Teamster
       attr_reader :target_service_uri
       attr_reader :target_service_configuration
       attr_reader :dynamic_files
+      attr_reader :meta_tags
 
       def initialize( &block )
         @asset_paths = []
         @dynamic_files = []
         @app_paths = []
+        @meta_tags = []
         self.instance_eval( &block ) if block_given?
       end
 
@@ -55,6 +57,10 @@ module Teamster
 
       def stylesheets( &block )
         self.instance_eval( &block ) if block_given?
+      end
+
+      def set_metatags(&block)
+        self.instance_eval(&block) if block_given?
       end
 
       define_attribute :concatenate,  default: false
@@ -77,6 +83,10 @@ module Teamster
 
       def directory( dir )
         @asset_paths << dir unless @asset_paths.include?( dir )
+      end
+
+      def tag(tag_hash)
+        @meta_tags << tag_hash
       end
 
       def copy_files(*arguments, &block)
