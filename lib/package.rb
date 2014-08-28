@@ -71,7 +71,7 @@ class Package
           css_file = sprockets[css_match[0]].logical_path
         end
         data += "<link rel=\"stylesheet\" href=\"#{host}/assets/#{css_file}\">\n"
-      elsif line =~ /com.bedrocket.boxspring/ && line =~ /<meta/
+      elsif line =~ /com.boxxspring/ && line =~ /<meta/ && line =~ /localhost/
         # ignore existing boxspring values
       elsif line =~ /<\/head>/
         package_config.meta_tags.each do |tag|
